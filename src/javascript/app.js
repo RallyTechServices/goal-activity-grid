@@ -9,8 +9,8 @@ Ext.define('CustomApp', {
     ],
     title: 'Goal Activity by Project',
     p2AncestorType: 'Investment',
-    p1AncestorTypePath: 'PortfolioItem/Initiative',
-    p2AncestorTypePath: 'PortfolioItem/Theme',
+    p1AncestorTypePath: 'PortfolioItem/Goal',
+    p2AncestorTypePath: 'PortfolioItem/Investment',
     p1AncestorHash: {},
     p2AncestorHash: {},  
     launch: function() {
@@ -166,6 +166,7 @@ Ext.define('CustomApp', {
             data: data,
             groupField: 'p2AncestorFormattedID',
             groupDir: 'ASC',
+            pageSize: 200,
             getGroupString: function(record) {
                 var fid = record.get('p2AncestorFormattedID');
                 var name = record.get('p2AncestorName');
