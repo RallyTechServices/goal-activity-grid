@@ -3,11 +3,11 @@
 <head>
     <title>Goal Activity Grid</title>
     <!--  (c) 2014 Rally Software Development Corp.  All Rights Reserved. -->
-    <!--  Build Date: Mon Feb 16 2015 00:01:15 GMT-0500 (EST) -->
+    <!--  Build Date: Mon Feb 16 2015 00:04:22 GMT-0500 (EST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Mon Feb 16 2015 00:01:15 GMT-0500 (EST)";
-        var CHECKSUM = 5092239078;
+        var APP_BUILD_DATE = "Mon Feb 16 2015 00:04:22 GMT-0500 (EST)";
+        var CHECKSUM = 5102484700;
     </script>
     
     <script type="text/javascript" src="/apps/2.0rc3/sdk.js"></script>
@@ -160,8 +160,8 @@ Ext.define('CustomApp', {
     ],
     title: 'Goal Activity by Project',
     p2AncestorType: 'Investment',
-    p1AncestorTypePath: 'PortfolioItem/Initiative',
-    p2AncestorTypePath: 'PortfolioItem/Theme',
+    p1AncestorTypePath: 'PortfolioItem/Goal',
+    p2AncestorTypePath: 'PortfolioItem/Investment',
     p1AncestorHash: {},
     p2AncestorHash: {},  
     launch: function() {
@@ -317,6 +317,7 @@ Ext.define('CustomApp', {
             data: data,
             groupField: 'p2AncestorFormattedID',
             groupDir: 'ASC',
+            pageSize: 200,
             getGroupString: function(record) {
                 var fid = record.get('p2AncestorFormattedID');
                 var name = record.get('p2AncestorName');
