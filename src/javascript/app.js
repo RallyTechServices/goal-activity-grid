@@ -4,10 +4,19 @@ Ext.define('CustomApp', {
     logger: new Rally.technicalservices.Logger(),
     items: [
         {xtype:'container',itemId:'message_box',tpl:'Hello, <tpl>{_refObjectName}</tpl>'},
+        {xtype:'container',itemId:'selector_box', padding: 15, layout: {type: 'hbox'}},
         {xtype:'container',itemId:'display_box', padding: 15},
         {xtype:'tsinfolink'}
     ],
     title: 'Goal Activity by Project',
+    exportHash: {
+        FormattedID: 'Formatted ID',
+        Name: 'Name',
+        p1AncestorFormattedID: 'Goal ID',
+        p1AncestorName: 'Goal Name',
+        p2AncestorFormattedID: 'Investment ID',
+        p2AncestorName: 'Investment Name'
+    },
     p2AncestorType: 'Investment',
     p1AncestorTypePath: 'PortfolioItem/Goal',
     p2AncestorTypePath: 'PortfolioItem/Investment',
@@ -31,7 +40,7 @@ Ext.define('CustomApp', {
         
         var prj = this.getContext().getProjectRef();
         //This will only show iterations for the current project.  
-        this.down('#display_box').add({
+        this.down('#selector_box').add({
             xtype: 'rallyiterationcombobox',
             itemId: 'cb-iteration',
             storeConfig: {
@@ -47,6 +56,20 @@ Ext.define('CustomApp', {
                 ready: this._prepareGridData
             }
         });
+        
+        this.down('#selector_box').add({
+            xtype: 'rallybutton',
+            text: 'Export',
+            scope: this,
+            handler: this._export
+        });
+    },
+    _export: function(){
+        if (this.exportData){
+            this.logger.log('_export', this.exportHash);
+            var text = Rally.technicalservices.FileUtilities.convertDataArrayToCSVText(this.exportData, this.exportHash);
+            Rally.technicalservices.FileUtilities.saveTextAsFile(text, 'goal-activity.csv');
+        }
     },
     _fetchIterations: function(iterationName){
         var deferred = Ext.create('Deft.Deferred');
@@ -74,7 +97,13 @@ Ext.define('CustomApp', {
         return deferred;  
     },
     _prepareGridData: function(iterationCombobox){
-        //First, if the project is scoped down, we need to get all matching iterations.      
+        //First, if the project is scoped down, we need to get all matching iterations.  
+        
+        if (this.down('#grd')){
+            this.down('#grd').destroy();  
+        }
+
+        
         var iterations = [];  
         var rec = iterationCombobox.getRecord();  
         this.logger.log('_prepareGridData',rec);
@@ -84,12 +113,14 @@ Ext.define('CustomApp', {
                 this._fetchIterations(iteration_name).then({
                     scope: this, 
                     success: function(iterationRecords){
+                        this.logger.log('_prepareGridData success (iterations)', iterationRecords.length);
                         Ext.each(iterationRecords, function(irec){
                             iterations.push(irec.get('ObjectID'));
                         });
                         this._fetchArtifacts(iterations).then({
                             scope: this,
                             success: function(artifactRecords){
+                                this.logger.log('_prepareGridData success (artifacts)',artifactRecords.length);
                                 var artifact_store = this._mungeArtifactRecords(artifactRecords);
                                 this._buildGrid(artifact_store);
                             }
@@ -101,6 +132,7 @@ Ext.define('CustomApp', {
                 this._fetchArtifacts(iterations).then({
                     scope: this,
                     success: function(artifactRecords){
+                        this.logger.log('_prepareGridData success (artifacts)', artifactRecords.length);
                         var artifact_store = this._mungeArtifactRecords(artifactRecords);
                         this._buildGrid(artifact_store);
                     }
@@ -117,7 +149,7 @@ Ext.define('CustomApp', {
         var p2Ancestors = this.p2AncestorHash;  
         var p2AncestorKeys = _.map(_.keys(p2Ancestors),function(oid){return Number(oid)});
         var p2AncestorType = this.p2AncestorType;
-       
+       this.logger.log('_mungeArtifactRecords', p1AncestorKeys, p2AncestorKeys);
         var data = []; 
         console.log(_.keys(p1Ancestors));
         Ext.each(artifactRecords, function(rec){
@@ -161,6 +193,7 @@ Ext.define('CustomApp', {
             data.push(munged_rec);
         },this);
         this.logger.log('_mungeArtifactRecords data',data);
+        this.exportData = data;  
         
         return Ext.create('Rally.data.custom.Store', {
             data: data,
@@ -217,6 +250,7 @@ Ext.define('CustomApp', {
            find: find,
            fetch: ["FormattedID",'ObjectID','Name',"_ItemHierarchy","_TypeHierarchy"],
            hydrate: ["_TypeHierarchy"],
+           limit: 'Infinity',
            listeners: {
                scope: this,
                load: function(store, records, success){
@@ -234,6 +268,7 @@ Ext.define('CustomApp', {
             autoLoad: true,
             model: modelType,  
             fetch: ['FormattedID','Name','ObjectID','Parent'],
+            limit: 'Infinity',
             context: {workspace: this.getContext().getWorkspace()._ref, project: null},
             listeners: {
                 scope: this,
