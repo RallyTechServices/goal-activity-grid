@@ -165,7 +165,7 @@ Ext.define('CustomApp', {
                 p1AncestorFid = p1Ancestors[p1AncestorOid].FormattedID;  
                 p1AncestorName = p1Ancestors[p1AncestorOid].Name;  
                 p1Ref = Ext.String.format('/{0}/{1}',this.p1AncestorTypePath.toLowerCase(),p1AncestorOid);
-                this.logger.log('p1 ancestor',p1Ref, p1AncestorFid);
+                this.logger.log('p1 ancestor',p1Ref, p1AncestorFid, p1AncestorName);
             }
               
           if (p2AncestorOid){
@@ -293,7 +293,7 @@ Ext.define('CustomApp', {
             renderer: function(v,m,r){
                 
                 if (v){
-                    var link_text = Ext.String.format('{0}: {1}', v, r.get('Name')); 
+                    var link_text = Ext.String.format('{0}: {1}', v, r.get('p1AncestorName')); 
                     return Rally.nav.DetailLink.getLink({record: r.get('p1AncestorRef'), text: link_text});
                 }
                 return '';
