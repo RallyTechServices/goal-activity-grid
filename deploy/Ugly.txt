@@ -3,10 +3,10 @@
 <head>
     <title>Goal Activity Grid</title>
     <!--  (c) 2013 Rally Software Development Corp.  All Rights Reserved. -->
-    <!--  Build Date: Mon Mar 16 2015 10:33:13 GMT-0700 (PDT) -->
+    <!--  Build Date: Mon Mar 16 2015 17:06:29 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Mon Mar 16 2015 10:33:13 GMT-0700 (PDT)";
+        var APP_BUILD_DATE = "Mon Mar 16 2015 17:06:29 GMT-0700 (PDT)";
         var CHECKSUM = [%= checksum %];
     </script>
     
